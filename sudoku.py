@@ -40,12 +40,14 @@ def resolver_sudoku(tablero):
         if es_valido(tablero, fila, col, num):
             nodos_explorados += 1
             tablero[fila][col] = num
+            camino.append([fila+1, col+1, num, nodos_explorados])
+            
 
             if resolver_sudoku(tablero):
-                camino.append([fila+1, col+1, num])
                 return True
             else:
                 tablero[fila][col] = 0
+                camino.pop()
     return False
 
 def llenar_tablero(tablero):
@@ -153,8 +155,8 @@ else:
 
 print("Camino:")
 i = 1
-for paso in reversed(camino):
-    print(f"numero {i} asentado: {paso}")
+for paso in camino:
+    print(f"numero {i} asentado: {paso[0],paso[1],paso[2]} en el nodo {paso[3]}")
     i+=1
 
 print(f"Nodos explorados: {nodos_explorados}")

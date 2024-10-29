@@ -56,12 +56,13 @@ def resolver_sudoku(tablero):
         if es_valido(tablero, fila, col, num):
             nodos_explorados += 1
             tablero[fila][col] = num
+            camino.append([fila+1, col+1, num, nodos_explorados])
 
             if resolver_sudoku(tablero):
-                camino.append([fila+1, col+1, num])
                 return True
             else:
                 tablero[fila][col] = 0
+                camino.pop()
     return False
 
 def llenar_tablero(tablero):
@@ -101,10 +102,16 @@ def generar_tablero(dificultad):
     
     return tablero
 
-def ingresar_tablero():
+def ingresar_tablero(dificultad):
     tablero = [[0 for i in range(9)] for i in range(9)]
     print("Ingresa el tablero de Sudoku manualmente:")
-    while True:
+    celdas_a_llenar = {
+        'facil': random.randint(35, 50),
+        'medio': random.randint(22, 34),
+        'dificil': random.randint(10, 21)
+    }.get(dificultad, 35)
+    i = 0
+    while i < celdas_a_llenar:
         print("\nTablero actual:")
         for fila in tablero:
             print(fila)
@@ -118,7 +125,11 @@ def ingresar_tablero():
 
         if 0 <= fila < 9 and 0 <= col < 9 and 0 <= num <= 9:
             if num == 0 or es_valido(tablero, fila, col, num):
-                tablero[fila][col] = num
+                if num != 0:
+                    tablero[fila][col] = num
+                    i+=1
+                else:
+                    tablero[fila][col] = num
             else:
                 print("Número inválido. No se respetan las reglas del sudoku.")
         else:
@@ -148,7 +159,20 @@ if modo == '1':
         tablero = generar_tablero('facil')
 
 elif modo == '2':
-    tablero = ingresar_tablero()
+    print("\nSelecciona la dificultad del Sudoku:")
+    print("1. Fácil")
+    print("2. Medio")
+    print("3. Difícil")
+    dificultad = input("Ingresa el número de la dificultad elegida: ")
+    if dificultad == '1':
+        tablero = ingresar_tablero('facil')
+    elif dificultad == '2':
+        tablero = ingresar_tablero('medio')
+    elif dificultad == '3':
+        tablero = ingresar_tablero('dificil')
+    else:
+        print("Dificultad no válida. Generando tablero fácil.")
+        tablero = generar_tablero('facil')
 else:
     print("Opción no válida. Generando tablero fácil aleatorio.")
     tablero = generar_tablero('facil')
@@ -169,8 +193,8 @@ else:
 
 print("Camino:")
 i = 1
-for paso in reversed(camino):
-    print(f"numero {i} asentado: {paso}")
+for paso in camino:
+    print(f"numero {i} asentado: {paso[0],paso[1],paso[2]} en el nodo {paso[3]}")
     i+=1
 
 print(f"Nodos explorados: {nodos_explorados}")
