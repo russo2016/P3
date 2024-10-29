@@ -21,15 +21,31 @@ def es_valido(tablero, fila, col, num):
 
     return True
 
-def encontrar_vacio(tablero):
-    for fila in range(9):
-        for col in range(9):
-            if tablero[fila][col] == 0:
-                return fila, col
-    return None
+def encontrar_vacio_menos_candidatos(tablero):
+    min_candidatos = 10
+    mejor_celda = None
+    for i in range(9):
+        for j in range(9):
+            if tablero[i][j] == 0:
+                candidatos = obtener_candidatos(tablero, i, j)
+                if len(candidatos) < min_candidatos:
+                    min_candidatos = len(candidatos)
+                    mejor_celda = (i, j)
+    return mejor_celda
+
+def obtener_candidatos(tablero, fila, col):
+    candidatos = set(range(1, 10))
+    for i in range(9):
+        candidatos.discard(tablero[fila][i])
+        candidatos.discard(tablero[i][col])
+    inicio_fila, inicio_col = 3 * (fila // 3), 3 * (col // 3)
+    for i in range(3):
+        for j in range(3):
+            candidatos.discard(tablero[inicio_fila + i][inicio_col + j])
+    return list(candidatos)
 
 def resolver_sudoku(tablero):
-    vacio = encontrar_vacio(tablero)
+    vacio = encontrar_vacio_menos_candidatos(tablero)
     global nodos_explorados
     global camino
     if not vacio:
