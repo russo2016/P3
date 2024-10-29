@@ -2,7 +2,7 @@ import random
 
 nodos_explorados = 0
 camino = []
-
+#funciones
 def es_valido(tablero, fila, col, num):
     for i in range(9):
         if tablero[fila][i] == num:
@@ -106,10 +106,10 @@ def ingresar_tablero(dificultad):
     tablero = [[0 for i in range(9)] for i in range(9)]
     print("Ingresa el tablero de Sudoku manualmente:")
     celdas_a_llenar = {
-        'facil': random.randint(35, 50),
-        'medio': random.randint(22, 34),
-        'dificil': random.randint(10, 21)
-    }.get(dificultad, 35)
+        'facil': 50,
+        'medio': 34,
+        'dificil': 21
+    }.get(dificultad, 50)
     i = 0
     while i < celdas_a_llenar:
         print("\nTablero actual:")
@@ -136,6 +136,7 @@ def ingresar_tablero(dificultad):
             print("fila, colummna o numero invalido.")    
     return tablero
 
+#main
 print("Selecciona el tipo de tablero:")
 print("1. Generar tablero aleatorio")
 print("2. Ingresar tablero manualmente")

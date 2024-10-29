@@ -3,6 +3,7 @@ import random
 nodos_explorados = 0
 camino = []
 
+#funciones
 def es_valido(tablero, fila, col, num):
     for i in range(9):
         if tablero[fila][i] == num:
@@ -87,10 +88,16 @@ def generar_tablero(dificultad):
     
     return tablero
 
-def ingresar_tablero():
+def ingresar_tablero(dificultad):
     tablero = [[0 for i in range(9)] for i in range(9)]
     print("Ingresa el tablero de Sudoku manualmente:")
-    while True:
+    celdas_a_llenar = {
+        'facil': 50,
+        'medio': 34,
+        'dificil': 21
+    }.get(dificultad, 50)
+    i = 0
+    while i < celdas_a_llenar:
         print("\nTablero actual:")
         for fila in tablero:
             print(fila)
@@ -104,13 +111,18 @@ def ingresar_tablero():
 
         if 0 <= fila < 9 and 0 <= col < 9 and 0 <= num <= 9:
             if num == 0 or es_valido(tablero, fila, col, num):
-                tablero[fila][col] = num
+                if num != 0:
+                    tablero[fila][col] = num
+                    i+=1
+                else:
+                    tablero[fila][col] = num
             else:
                 print("Número inválido. No se respetan las reglas del sudoku.")
         else:
             print("fila, colummna o numero invalido.")    
     return tablero
 
+#main
 print("Selecciona el tipo de tablero:")
 print("1. Generar tablero aleatorio")
 print("2. Ingresar tablero manualmente")
@@ -134,7 +146,20 @@ if modo == '1':
         tablero = generar_tablero('facil')
 
 elif modo == '2':
-    tablero = ingresar_tablero()
+    print("\nSelecciona la dificultad del Sudoku:")
+    print("1. Fácil")
+    print("2. Medio")
+    print("3. Difícil")
+    dificultad = input("Ingresa el número de la dificultad elegida: ")
+    if dificultad == '1':
+        tablero = ingresar_tablero('facil')
+    elif dificultad == '2':
+        tablero = ingresar_tablero('medio')
+    elif dificultad == '3':
+        tablero = ingresar_tablero('dificil')
+    else:
+        print("Dificultad no válida. Generando tablero fácil.")
+        tablero = generar_tablero('facil')
 else:
     print("Opción no válida. Generando tablero fácil aleatorio.")
     tablero = generar_tablero('facil')
