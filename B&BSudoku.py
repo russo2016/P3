@@ -111,21 +111,25 @@ def ingresar_tablero(dificultad):
         'dificil': 21
     }.get(dificultad, 50)
     i = 0
-    while i < celdas_a_llenar:
+    while i <= max(celdas_a_llenar):
         print("\nTablero actual:")
         for fila in tablero:
             print(fila)
 
         fila = int(input("Ingresa la fila (1-9) o -1 para finalizar: ")) - 1
         if fila == -2:
-            break
+            if i >= min(celdas_a_llenar):
+                break
+            else:
+                print(f"El tablero debe tener al menos {min(celdas_a_llenar)} celdas llenas.")
+                continue
 
         col = int(input("Ingresa la columna (1-9): ")) - 1
         num = int(input("Ingresa el número (1-9) o 0 para dejar vacío: "))
 
         if 0 <= fila < 9 and 0 <= col < 9 and 0 <= num <= 9:
             if num == 0 or es_valido(tablero, fila, col, num):
-                if num != 0:
+                if num != 0 and tablero[fila][col] == 0:
                     tablero[fila][col] = num
                     i+=1
                 else:
