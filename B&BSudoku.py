@@ -106,9 +106,9 @@ def ingresar_tablero(dificultad):
     tablero = [[0 for i in range(9)] for i in range(9)]
     print("Ingresa el tablero de Sudoku manualmente:")
     celdas_a_llenar = {
-        'facil': 50,
-        'medio': 34,
-        'dificil': 21
+        'facil': (35, 50),
+        'medio': (22, 34),
+        'dificil': (10, 21)
     }.get(dificultad, 50)
     i = 0
     while i <= max(celdas_a_llenar):
