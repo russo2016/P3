@@ -24,6 +24,7 @@ def es_valido(tablero, fila, col, num):
 def encontrar_vacio_menos_candidatos(tablero):
     min_candidatos = 10
     mejor_celda = None
+    mejor_candidatos = []  # Almacena los candidatos de la mejor celda
     for i in range(9):
         for j in range(9):
             if tablero[i][j] == 0:
@@ -31,7 +32,9 @@ def encontrar_vacio_menos_candidatos(tablero):
                 if len(candidatos) < min_candidatos:
                     min_candidatos = len(candidatos)
                     mejor_celda = (i, j)
-    return mejor_celda
+                    mejor_candidatos = candidatos  # Actualiza los mejores candidatos
+    return mejor_celda, mejor_candidatos  # Devuelve la mejor celda y sus candidatos
+
 
 def obtener_candidatos(tablero, fila, col):
     candidatos = set(range(1, 10))
@@ -45,14 +48,14 @@ def obtener_candidatos(tablero, fila, col):
     return list(candidatos)
 
 def resolver_sudoku(tablero):
-    vacio = encontrar_vacio_menos_candidatos(tablero)
+    vacio,candidatos = encontrar_vacio_menos_candidatos(tablero)
     global nodos_explorados
     global camino
     if not vacio:
         return True
     fila, col = vacio
 
-    for num in range(1, 10):
+    for num in candidatos:
         if es_valido(tablero, fila, col, num):
             nodos_explorados += 1
             tablero[fila][col] = num
@@ -203,4 +206,3 @@ for paso in camino:
     i+=1
 
 print(f"Nodos explorados: {nodos_explorados}")
-

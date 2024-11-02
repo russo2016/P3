@@ -189,4 +189,3 @@ for paso in camino:
     i+=1
 
 print(f"Nodos explorados: {nodos_explorados}")
-
