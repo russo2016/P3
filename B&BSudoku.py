@@ -41,7 +41,8 @@ def obtener_candidatos(tablero, fila, col):
     for i in range(9):
         candidatos.discard(tablero[fila][i])
         candidatos.discard(tablero[i][col])
-    inicio_fila, inicio_col = 3 * (fila // 3), 3 * (col // 3)
+    inicio_fila = fila - fila % 3
+    inicio_col = col - col % 3
     for i in range(3):
         for j in range(3):
             candidatos.discard(tablero[inicio_fila + i][inicio_col + j])
