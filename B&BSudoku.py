@@ -24,7 +24,7 @@ def es_valido(tablero, fila, col, num):
 def encontrar_vacio_menos_candidatos(tablero):
     min_candidatos = 10
     mejor_celda = None
-    mejor_candidatos = []  # Almacena los candidatos de la mejor celda
+    mejor_candidatos = []
     for i in range(9):
         for j in range(9):
             if tablero[i][j] == 0:
@@ -32,8 +32,8 @@ def encontrar_vacio_menos_candidatos(tablero):
                 if len(candidatos) < min_candidatos:
                     min_candidatos = len(candidatos)
                     mejor_celda = (i, j)
-                    mejor_candidatos = candidatos  # Actualiza los mejores candidatos
-    return mejor_celda, mejor_candidatos  # Devuelve la mejor celda y sus candidatos
+                    mejor_candidatos = candidatos
+    return mejor_celda, mejor_candidatos
 
 
 def obtener_candidatos(tablero, fila, col):
