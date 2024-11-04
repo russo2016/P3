@@ -38,14 +38,9 @@ def encontrar_vacio_menos_candidatos(tablero):
 
 def obtener_candidatos(tablero, fila, col):
     candidatos = set(range(1, 10))
-    for i in range(9):
-        candidatos.discard(tablero[fila][i])
-        candidatos.discard(tablero[i][col])
-    inicio_fila = fila - fila % 3
-    inicio_col = col - col % 3
-    for i in range(3):
-        for j in range(3):
-            candidatos.discard(tablero[inicio_fila + i][inicio_col + j])
+    for i in range(1,9):
+        if not es_valido(tablero, fila, col, i):
+            candidatos.discard(i)
     return list(candidatos)
 
 def resolver_sudoku(tablero):
