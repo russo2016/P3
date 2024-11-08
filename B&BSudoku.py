@@ -39,7 +39,7 @@ def encontrar_vacio_menos_candidatos(tablero):
 
 def obtener_candidatos(tablero, fila, col):
     candidatos = set(range(1, 10))
-    for i in range(1,9):
+    for i in range(1,10):
         if not es_valido(tablero, fila, col, i):
             candidatos.discard(i)
     return list(candidatos)
@@ -159,7 +159,6 @@ def llenar_manual(tablero):
             continue
 
         candidatos = obtener_candidatos(tablero, fila, col)
-        print(f"Candidatos para la celda ({fila+1}, {col+1}): {candidatos}")
         if tablero[fila][col] == 0:
             num = int(input("Ingresa el número (1-9) o 0 para dejar vacío: "))
             tablero_temporal = [fila[:] for fila in tablero]
@@ -229,11 +228,13 @@ if modo == '1':
             for fila in tablero:
                 print(fila)
             print("\nCamino:")
+            i=0
             for paso in camino:
                 tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
-                print(f"Paso {paso[3]}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+                print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
                 for fila in tablero_inicial:
                     print(fila)
+                i+=1
                 
 
             print(f"\nNodos explorados: {nodos_explorados}")
@@ -244,12 +245,13 @@ if modo == '1':
         if resolver_sudoku(tablero):
             for fila in tablero:
                 print(fila)
-            print("\nCamino:")
+            i=0
             for paso in camino:
                 tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
-                print(f"Paso {paso[3]}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+                print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
                 for fila in tablero_inicial:
                     print(fila)
+                i+=1
                 
 
             print(f"\nNodos explorados: {nodos_explorados}")
@@ -281,12 +283,13 @@ elif modo == '2':
     if resolver_sudoku(tablero):
         for fila in tablero:
             print(fila)
-        print("\nCamino:")
+        i=0
         for paso in camino:
             tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
-            print(f"Paso {paso[3]}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+            print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
             for fila in tablero_inicial:
                 print(fila)
+            i+=1
             
 
         print(f"\nNodos explorados: {nodos_explorados}")
@@ -303,14 +306,12 @@ else:
     if resolver_sudoku(tablero):
         for fila in tablero:
             print(fila)
+        i=0
+        for paso in camino:
+            tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
+            print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+            for fila in tablero_inicial:
+                print(fila)
+            i+=1
     else:       
         print("No hubo solución")
-    print("\nCamino:")
-    for paso in camino:
-        tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
-        print(f"Paso {paso[3]}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
-        for fila in tablero_inicial:
-            print(fila)
-        
-
-    print(f"\nNodos explorados: {nodos_explorados}")
