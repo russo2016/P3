@@ -1,4 +1,5 @@
 import random
+import copy
 
 nodos_explorados = 0
 camino = []
@@ -126,11 +127,52 @@ def ingresar_tablero(dificultad):
             print("fila, colummna o numero invalido.")    
     return tablero
 
+def llenar_manual(tablero):
+    errores = 0
+    print("Puedes llenar el tablero manualmente:")
+    while True:
+        print("\nTablero actual:")
+        for fila in tablero:
+            print(fila)
+
+        fila = int(input("Ingresa la fila (1-9) o -1 para finalizar: ")) - 1
+        if fila == -2:
+            break
+
+        col = int(input("Ingresa la columna (1-9): ")) - 1
+        num = int(input("Ingresa el número (1-9) o 0 para dejar vacío: "))
+
+        if 0 <= fila < 9 and 0 <= col < 9 and 0 <= num <= 9:
+            if tablero[fila][col] == 0:
+                if num == 0 or es_valido(tablero, fila, col, num):
+                    tablero_temporal = [fila[:] for fila in tablero]
+                    tablero_temporal[fila][col] = num
+
+                    if num == 0 or resolver_sudoku(tablero_temporal):
+                        tablero[fila][col] = num
+                    else:
+                        print("El nùmero no va en esa posición.")
+                        errores += 1
+                        print(f"Errores: {errores}. Máximo permitido: 3.")
+                        if errores == 3:
+                            print("Has cometido 3 errores.")
+                            break
+                else:
+                    print("Número inválido. No se respetan las reglas del sudoku.")
+            else:
+                print("La celda ya está llena.")
+        else:
+            print("Fila, columna o número inválido.")
+
+
 #main
 print("Selecciona el tipo de tablero:")
 print("1. Generar tablero aleatorio")
 print("2. Ingresar tablero manualmente")
 modo = input("Ingresa el número de la opción elegida: ")
+nodos_explorados = 0
+camino = []
+tableros = []
 
 if modo == '1':
     print("\nSelecciona la dificultad del Sudoku:")
@@ -149,6 +191,34 @@ if modo == '1':
         print("Dificultad no válida. Generando tablero fácil.")
         tablero = generar_tablero('facil')
 
+    print("\nTablero generado:")
+    for fila in tablero:
+        print(fila)
+    tablero_inicial = copy.deepcopy(tablero)
+    print("\n¿Deseas llenar el tablero manualmente?")
+    print("1. Sí")
+    print("2. No")
+    llenar = input("Ingresa el número de la opción elegida: ")
+    if llenar == '1':
+        llenar_manual(tablero)
+    elif llenar == '2':
+        print("\nResoluciòn:")
+        if resolver_sudoku(tablero):
+            for fila in tablero:
+                print(fila)
+        else:
+            print("No hubo solución")
+        print("\nCamino:")
+        i = 0
+        for paso in camino:
+            tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
+            print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+            i += 1
+            for fila in tablero_inicial:
+                print(fila)
+        
+        
+
 elif modo == '2':
     print("\nSelecciona la dificultad del Sudoku:")
     print("1. Fácil")
@@ -164,28 +234,51 @@ elif modo == '2':
     else:
         print("Dificultad no válida. Generando tablero fácil.")
         tablero = generar_tablero('facil')
+    tablero_inicial = copy.deepcopy(tablero)
+    
+    print("\nTablero generado:")
+    for fila in tablero:
+        print(fila)
+
+
+    print("\nResoluciòn:")
+    if resolver_sudoku(tablero):
+        for fila in tablero:
+            print(fila)
+    else:       
+        print("No hubo solución")
+    print("\nCamino:")
+    i=0
+    for paso in camino:
+        tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
+        print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+        i += 1
+        for fila in tablero_inicial:
+            print(fila)
+        
+
+    print(f"\nNodos explorados: {nodos_explorados}")
 else:
     print("Opción no válida. Generando tablero fácil aleatorio.")
     tablero = generar_tablero('facil')
-
-print("\nTablero inicial:")
-for fila in tablero:
-    print(fila)
-
-nodos_explorados = 0
-camino = []
-
-print("\nResolución:")
-if resolver_sudoku(tablero):
+    print("\nTablero generado:")
     for fila in tablero:
         print(fila)
-else:
-    print("No hubo solución")
+    tablero_inicial = copy.deepcopy(tablero)
+    print("\nResoluciòn:")
+    if resolver_sudoku(tablero):
+        for fila in tablero:
+            print(fila)
+    else:       
+        print("No hubo solución")
+    print("\nCamino:")
+    i=0
+    for paso in camino:
+        tablero_inicial[paso[0]-1][paso[1]-1] = paso[2]
+        print(f"Paso {i}: fila: {paso[0]}, columna: {paso[1]}, número: {paso[2]}, en el nodo {paso[3]}")
+        i += 1
+        for fila in tablero_inicial:
+            print(fila)
+        
 
-print("Camino:")
-i = 1
-for paso in camino:
-    print(f"numero {i} asentado: {paso[0],paso[1],paso[2]} en el nodo {paso[3]}")
-    i+=1
-
-print(f"Nodos explorados: {nodos_explorados}")
+    print(f"\nNodos explorados: {nodos_explorados}")
