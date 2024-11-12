@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import messagebox
 
 nodos_explorados = 0
-camino = []
 
 # Funciones
 def es_valido(tablero, fila, col, num):
@@ -51,61 +50,28 @@ def encontrar_vacio_menos_candidatos(tablero):
                 heapq.heappush(min_heap, (len(candidatos), i, j, candidatos))
     return min_heap
 
-def resolver_sudoku(tablero):
-    global nodos_explorados
-    global camino
-    cola_prioridad = encontrar_vacio_menos_candidatos(tablero)
-    if not cola_prioridad:
-        return True
-    _, fila, col, candidatos = heapq.heappop(cola_prioridad)
+def verificar_unidad(unidad):
+    if 0 in unidad:
+        return False
+    unidad = [num for num in unidad if num != 0 ]
+    return len(unidad) == len(set(unidad)) and all(1 <= num <= 9 for num in unidad)
 
-    for num in candidatos:
-        if es_valido(tablero, fila, col, num):
-            nodos_explorados += 1
-            tablero[fila][col] = num
-            camino.append([fila + 1, col + 1, num, nodos_explorados])
-            if resolver_sudoku(tablero):
-                return True
-            else:
-                tablero[fila][col] = 0
-                camino.pop()
-    return False
 
-def llenar_tablero(tablero):
+def verificar_solucion_(tablero):
     for fila in range(9):
-        for col in range(9):
-            if tablero[fila][col] == 0:
-                numeros = list(range(1, 10))
-                random.shuffle(numeros)
-                for num in numeros:
-                    if es_valido(tablero, fila, col, num):
-                        tablero[fila][col] = num
-                        if llenar_tablero(tablero):
-                            return True
-                        tablero[fila][col] = 0
+        if not verificar_unidad([tablero[fila][col] for col in range(9)]):
+            return False
+
+    for col in range(9):
+        if not verificar_unidad([tablero[fila][col] for fila in range(9)]):
+            return False
+
+    for inicio_fila in range(0, 9, 3):
+        for inicio_col in range(0, 9, 3):
+            if not verificar_unidad([tablero[fila][col] for fila in range(inicio_fila, inicio_fila + 3) for col in range(inicio_col, inicio_col + 3)]):
                 return False
+
     return True
-
-def quitar_numeros(tablero, celdas_a_llenar):
-    celdas_a_quitar = 81 - celdas_a_llenar
-    while celdas_a_quitar > 0:
-        fila, col = random.randint(0, 8), random.randint(0, 8)
-        if tablero[fila][col] != 0:
-            tablero[fila][col] = 0
-            celdas_a_quitar -= 1
-
-def generar_tablero(dificultad):
-    tablero = [[0 for i in range(9)] for i in range(9)]
-    celdas_a_llenar = {
-        'facil': random.randint(35, 50),
-        'medio': random.randint(22, 34),
-        'dificil': random.randint(10, 21)
-    }.get(dificultad, 35)
-    
-    llenar_tablero(tablero)
-    quitar_numeros(tablero, celdas_a_llenar)
-    
-    return tablero
 
 class SudokuApp:
     def __init__(self, root):
@@ -134,6 +100,17 @@ class SudokuApp:
         tk.Button(frame, text="Generar Difícil", command=lambda: self.generar_tablero('dificil')).pack(side='left', padx=5)
         tk.Button(frame, text="Resolver Paso a Paso", command=self.resolver_paso_a_paso).pack(side='left', padx=5)
         tk.Button(frame, text="Limpiar", command=self.limpiar).pack(side='left', padx=5)
+        tk.Button(frame, text="Verificar Solución", command=self.verificar_solucion).pack(side='left', padx=5)
+
+
+    def verificar_solucion(self):
+        self.tablero = [[int(self.entries[fila][col].get()) if self.entries[fila][col].get().isdigit() else 0
+                         for col in range(9)] for fila in range(9)]
+        if verificar_solucion_(self.tablero):
+            messagebox.showinfo("Sudoku", "¡Solución correcta!")
+        else:
+            messagebox.showerror("Error", "¡Solución incorrecta!")
+
 
     def generar_tablero(self, dificultad):
         self.tablero = self._generar_tablero(dificultad)
@@ -227,7 +204,6 @@ class SudokuApp:
         global nodos_explorados
         global camino
         nodos_explorados = 0
-        camino = []
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -23,6 +23,30 @@ def encontrar_vacio(tablero):
                 return fila, col
     return None
 
+def verificar_unidad(unidad):
+    if 0 in unidad:
+        return False
+    unidad = [num for num in unidad if num != 0 ]
+    return len(unidad) == len(set(unidad)) and all(1 <= num <= 9 for num in unidad)
+
+
+def verificar_solucion_(tablero):
+    for fila in range(9):
+        if not verificar_unidad([tablero[fila][col] for col in range(9)]):
+            return False
+
+    for col in range(9):
+        if not verificar_unidad([tablero[fila][col] for fila in range(9)]):
+            return False
+
+    for inicio_fila in range(0, 9, 3):
+        for inicio_col in range(0, 9, 3):
+            if not verificar_unidad([tablero[fila][col] for fila in range(inicio_fila, inicio_fila + 3) for col in range(inicio_col, inicio_col + 3)]):
+                return False
+
+    return True
+
+
 class SudokuApp:
     def __init__(self, root):
         self.root = root
@@ -50,6 +74,16 @@ class SudokuApp:
         tk.Button(frame, text="Generar Difícil", command=lambda: self.generar_tablero('dificil')).pack(side='left', padx=5)
         tk.Button(frame, text="Resolver Paso a Paso", command=self.resolver_paso_a_paso).pack(side='left', padx=5)
         tk.Button(frame, text="Limpiar", command=self.limpiar).pack(side='left', padx=5)
+        tk.Button(frame, text="Verificar Solución", command=self.verificar_solucion).pack(side='left', padx=5)
+
+
+    def verificar_solucion(self):
+        self.tablero = [[int(self.entries[fila][col].get()) if self.entries[fila][col].get().isdigit() else 0
+                         for col in range(9)] for fila in range(9)]
+        if verificar_solucion_(self.tablero):
+            messagebox.showinfo("Sudoku", "¡Solución correcta!")
+        else:
+            messagebox.showerror("Error", "¡Solución incorrecta!")
 
     def generar_tablero(self, dificultad):
         self.tablero = self._generar_tablero(dificultad)
