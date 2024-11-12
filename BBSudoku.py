@@ -214,7 +214,7 @@ class SudokuApp:
                 self.tablero[fila][col] = 0
                 self.entries[fila][col].delete(0, tk.END)
                 self.entries[fila][col].update()
-                time.sleep(0.1)
+                time.sleep(0.01)
 
         return False
 
