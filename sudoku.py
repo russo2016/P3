@@ -46,6 +46,32 @@ def verificar_solucion_(tablero):
 
     return True
 
+def es_tablero_valido(tablero):
+    # Verificar conflictos en las celdas con valores iniciales
+    for fila in range(9):
+        for col in range(9):
+            num = tablero[fila][col]
+            if num != 0:
+                # Temporalmente vaciamos la celda actual para verificar si el número es válido
+                tablero[fila][col] = 0
+                if not es_valido(tablero, fila, col, num):
+                    # Restauramos el valor antes de salir
+                    tablero[fila][col] = num
+                    return False
+                # Restauramos el valor después de la verificación
+                tablero[fila][col] = num
+
+    # Verificar que todas las celdas vacías tengan al menos un candidato posible
+    for fila in range(9):
+        for col in range(9):
+            if tablero[fila][col] == 0:
+                # Obtener los candidatos posibles
+                candidatos = [num for num in range(1, 10) if es_valido(tablero, fila, col, num)]
+                if not candidatos:  # Si no hay candidatos, el tablero es irresoluble
+                    return False
+
+    # Si no hay conflictos y todas las celdas vacías tienen candidatos, el tablero es válido
+    return True
 
 class SudokuApp:
     def __init__(self, root):
@@ -69,9 +95,9 @@ class SudokuApp:
     def dibujar_botones(self):
         frame = tk.Frame(self.root)
         frame.pack(pady=10)
-        tk.Button(frame, text="Generar Fácil", command=lambda: self.generar_tablero('facil')).pack(side='left', padx=5)
-        tk.Button(frame, text="Generar Medio", command=lambda: self.generar_tablero('medio')).pack(side='left', padx=5)
-        tk.Button(frame, text="Generar Difícil", command=lambda: self.generar_tablero('dificil')).pack(side='left', padx=5)
+        tk.Button(frame, text="Generar Fácil", command=lambda: (self.limpiar(), self.generar_tablero('facil'))).pack(side='left', padx=5)
+        tk.Button(frame, text="Generar Medio", command=lambda: (self.limpiar(), self.generar_tablero('medio'))).pack(side='left', padx=5)
+        tk.Button(frame, text="Generar Difícil", command=lambda: (self.limpiar(), self.generar_tablero('dificil'))).pack(side='left', padx=5)
         tk.Button(frame, text="Resolver Paso a Paso", command=self.resolver_paso_a_paso).pack(side='left', padx=5)
         tk.Button(frame, text="Limpiar", command=self.limpiar).pack(side='left', padx=5)
         tk.Button(frame, text="Verificar Solución", command=self.verificar_solucion).pack(side='left', padx=5)
@@ -132,15 +158,30 @@ class SudokuApp:
                 celdas_a_quitar -= 1
 
     def resolver_paso_a_paso(self):
+        # Copia los valores del tablero actual desde las entradas y bloquea las celdas iniciales
+        for fila in range(9):
+            for col in range(9):
+                valor = self.entries[fila][col].get()
+                if valor.isdigit() and int(valor) != 0:
+                    self.tablero[fila][col] = int(valor)
+                    self.entries[fila][col].config(state='disabled')
+                else:
+                    self.tablero[fila][col] = 0
 
-        self.tablero = [[int(self.entries[fila][col].get()) if self.entries[fila][col].get().isdigit() else 0
-                         for col in range(9)] for fila in range(9)]
+        # Verifica si el tablero inicial es válido antes de intentar resolverlo
+        if not es_tablero_valido(self.tablero):
+            messagebox.showerror("Error", "El tablero inicial tiene conflictos o es irresoluble.")
+            return
+
+        # Procede a resolver si el tablero es válido
         start_time = time.time()
         self.nodos_explorados = 0
         if self._resolver_paso_a_paso():
             elapsed_time = time.time() - start_time
-            messagebox.showinfo("Sudoku", f"¡Resuelto! se revisaron {self.nodos_explorados} nodos en {round(elapsed_time, 3)} segundos")
-            
+            messagebox.showinfo("Sudoku",
+                                f"¡Resuelto! se revisaron {self.nodos_explorados} nodos en {round(elapsed_time, 3)} segundos")
+        else:
+            messagebox.showerror("Error", "No se pudo resolver el Sudoku")
 
     def _resolver_paso_a_paso(self):
         vacio = encontrar_vacio(self.tablero)
