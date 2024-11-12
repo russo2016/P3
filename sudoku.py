@@ -102,9 +102,10 @@ class SudokuApp:
         self.tablero = [[int(self.entries[fila][col].get()) if self.entries[fila][col].get().isdigit() else 0
                          for col in range(9)] for fila in range(9)]
         start_time = time.time()
+        self.nodos_explorados = 0
         if self._resolver_paso_a_paso():
             elapsed_time = time.time() - start_time
-            messagebox.showinfo("Sudoku", "¡Resuelto! en {:.2f} segundos".format(elapsed_time))
+            messagebox.showinfo("Sudoku", f"¡Resuelto! se revisaron {self.nodos_explorados} nodos en {round(elapsed_time, 3)} segundos")
             
 
     def _resolver_paso_a_paso(self):
@@ -121,13 +122,15 @@ class SudokuApp:
                 self.entries[fila][col].update()
                 time.sleep(0.01)
 
+                self.nodos_explorados += 1
+
                 if self._resolver_paso_a_paso():
                     return True
 
                 self.tablero[fila][col] = 0
                 self.entries[fila][col].delete(0, tk.END)
                 self.entries[fila][col].update()
-                time.sleep(0.1)
+                time.sleep(0.01)
 
         return False
 
@@ -137,6 +140,11 @@ class SudokuApp:
                 self.entries[fila][col].config(state='normal')
                 self.entries[fila][col].delete(0, tk.END)
                 self.tablero[fila][col] = 0
+        global nodos_explorados
+        global camino
+        nodos_explorados = 0
+        camino = []
+
 
 if __name__ == "__main__":
     root = tk.Tk()

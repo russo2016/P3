@@ -4,9 +4,11 @@ import time
 import heapq
 import tkinter as tk
 from tkinter import messagebox
+
 nodos_explorados = 0
 camino = []
-#funciones
+
+# Funciones
 def es_valido(tablero, fila, col, num):
     for i in range(9):
         if tablero[fila][i] == num:
@@ -69,7 +71,6 @@ def resolver_sudoku(tablero):
                 camino.pop()
     return False
 
-
 def llenar_tablero(tablero):
     for fila in range(9):
         for col in range(9):
@@ -101,94 +102,10 @@ def generar_tablero(dificultad):
         'dificil': random.randint(10, 21)
     }.get(dificultad, 35)
     
-
     llenar_tablero(tablero)
     quitar_numeros(tablero, celdas_a_llenar)
     
     return tablero
-
-def ingresar_tablero(dificultad):
-    tablero = [[0 for i in range(9)] for i in range(9)]
-    print("Ingresa el tablero de Sudoku manualmente:")
-    celdas_a_llenar = {
-        'facil': (35, 50),
-        'medio': (22, 34),
-        'dificil': (10, 21)
-    }.get(dificultad, 50)
-    i = 0
-    while i <= max(celdas_a_llenar):
-        print("\nTablero actual:")
-        for fila in tablero:
-            print(fila)
-
-        fila = int(input("Ingresa la fila (1-9) o -1 para finalizar: ")) - 1
-        if fila == -2:
-            if i >= min(celdas_a_llenar):
-                break
-            else:
-                print(f"El tablero debe tener al menos {min(celdas_a_llenar)} celdas llenas.")
-                continue
-
-        col = int(input("Ingresa la columna (1-9): ")) - 1
-        num = int(input("Ingresa el número (1-9) o 0 para dejar vacío: "))
-
-        if 0 <= fila < 9 and 0 <= col < 9 and 0 <= num <= 9:
-            if num == 0 or es_valido(tablero, fila, col, num):
-                if num != 0 and tablero[fila][col] == 0:
-                    tablero[fila][col] = num
-                    i+=1
-                else:
-                    tablero[fila][col] = num
-            else:
-                print("Número inválido. No se respetan las reglas del sudoku.")
-        else:
-            print("fila, colummna o numero invalido.")    
-    return tablero
-
-def llenar_manual(tablero):
-    errores = 0
-    print("Puedes llenar el tablero manualmente:")
-    while True:
-        print("\nTablero actual:")
-        for fila in tablero:
-            print(fila)
-
-        fila = int(input("Ingresa la fila (1-9) o -1 para finalizar: ")) - 1
-        if fila == -2:
-            break
-
-        col = int(input("Ingresa la columna (1-9): ")) - 1
-        if not (0 <= fila < 9 and 0 <= col < 9):
-            print("Fila o columna inválida. Inténtalo de nuevo.")
-            continue
-
-        candidatos = obtener_candidatos(tablero, fila, col)
-        print(f"Candidatos para la celda ({fila+1}, {col+1}): {candidatos}")
-        if tablero[fila][col] == 0:
-            num = int(input("Ingresa el número (1-9) o 0 para dejar vacío: "))
-            tablero_temporal = [fila[:] for fila in tablero]
-            tablero_temporal[fila][col] = num
-            if num == 0:
-                tablero[fila][col] = 0
-            elif num in candidatos:
-                if resolver_sudoku(tablero_temporal):
-                    tablero[fila][col] = num
-                else:
-                    errores += 1
-                    print("Opciòn invalida. ERROR")
-                    print(f"Tiene hasta 3 errores. Lleva {errores} errores")
-                    if errores == 3:
-                        print("Se ha alcanzado el máximo de errores.")
-                        break
-            else:
-                errores += 1
-                print("Opciòn invalida. ERROR")
-                print(f"Tiene hasta 3 errores. Lleva {errores} errores")
-                if errores == 3:
-                    print("Se ha alcanzado el máximo de errores.")
-                    break
-        else:
-            print("La celda ya está llena. Inténtalo de nuevo.")
 
 class SudokuApp:
     def __init__(self, root):
@@ -268,9 +185,10 @@ class SudokuApp:
         self.tablero = [[int(self.entries[fila][col].get()) if self.entries[fila][col].get().isdigit() else 0
                         for col in range(9)] for fila in range(9)]
         start_time = time.time()
+        self.nodos_explorados = 0
         if self._resolver_paso_a_paso():
             elapsed_time = time.time() - start_time
-            messagebox.showinfo("Completado", "¡Sudoku resuelto! en {:.2f} segundos".format(elapsed_time))
+            messagebox.showinfo("Sudoku", f"¡Resuelto! se revisaron {self.nodos_explorados} nodos en {round(elapsed_time, 3)} segundos")
         else:   
             messagebox.showerror("Error", "No se pudo resolver el Sudoku")
 
@@ -288,10 +206,10 @@ class SudokuApp:
                 self.entries[fila][col].insert(0, str(num))
                 self.entries[fila][col].update()
                 time.sleep(0.01)
+                self.nodos_explorados += 1
 
                 if self._resolver_paso_a_paso():
                     return True
-
 
                 self.tablero[fila][col] = 0
                 self.entries[fila][col].delete(0, tk.END)
@@ -306,9 +224,12 @@ class SudokuApp:
                 self.entries[fila][col].config(state='normal')
                 self.entries[fila][col].delete(0, tk.END)
                 self.tablero[fila][col] = 0
+        global nodos_explorados
+        global camino
+        nodos_explorados = 0
+        camino = []
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = SudokuApp(root)
     root.mainloop()
-
