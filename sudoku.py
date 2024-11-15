@@ -125,6 +125,7 @@ class SudokuApp:
 
     def _generar_tablero(self, dificultad):
         tablero = [[0 for _ in range(9)] for _ in range(9)]
+        self._llenar_cajas_diagonales(tablero)
         self._llenar_tablero(tablero)
         celdas_a_llenar = {
             'facil': random.randint(35, 50),
@@ -135,7 +136,6 @@ class SudokuApp:
         return tablero
 
     def _llenar_tablero(self, tablero):
-        self._llenar_cajas_diagonales(tablero)
         for fila in range(9):
             for col in range(9):
                 if tablero[fila][col] == 0:
@@ -155,12 +155,14 @@ class SudokuApp:
         for i in range(0, 9, 3):
             numeros = list(range(1, 10))
             random.shuffle(numeros)
-            for fila in range(i, i + 3):
-                for col in range(i, i + 3):
-                    for num in numeros:
-                        if es_valido(tablero, fila, col, num):
-                            tablero[fila][col] = num
-                            break
+
+            for j in range(3):
+                fila = i + j
+                col = i + j
+                for num in numeros:
+                    if es_valido(tablero, fila, col, num):
+                        tablero[fila][col] = num
+                        break
 
     def _quitar_numeros(self, tablero, celdas_a_llenar):
         celdas_a_quitar = 81 - celdas_a_llenar
